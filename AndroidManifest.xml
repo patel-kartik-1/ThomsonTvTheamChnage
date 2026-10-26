@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kartik.tvhome" android:versionCode="1" android:versionName="1.0">
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Android 9 only tells an app the Wi-Fi network's name if it has location access. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Reads the videos in the BAPS folders. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Sets the Sandhya Aarti reminder again after a restart. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent><action android:name="android.settings.WIFI_SETTINGS" /></intent>
+        <intent><action android:name="android.settings.BLUETOOTH_SETTINGS" /></intent>
+        <intent><action android:name="com.google.android.intent.action.CONNECT_INPUT" /></intent>
+        <package android:name="org.videolan.vlc" />
+        <package android:name="com.google.android.youtube.tv" />
+        <package android:name="com.android.tv" />
+    </queries>
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <application android:label="Home" android:allowBackup="false" android:banner="@drawable/banner" android:icon="@drawable/icon"
+        android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <activity android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask" android:stateNotNeeded="true"
+            android:clearTaskOnLaunch="true" android:excludeFromRecents="true"
+            android:screenOrientation="landscape"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode|locale">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Aarti$Popup"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:launchMode="singleInstance" android:taskAffinity=""
+            android:excludeFromRecents="true" android:noHistory="true" />
+        <receiver android:name=".Aarti$Alarm" android:exported="false" />
+        <receiver android:name=".Aarti$Boot" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

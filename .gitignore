@@ -1,0 +1,9 @@
+# Build output and the signing key (keep key.jks private: updates must be signed with it)
+out/
+key.jks
+*.apk
+
+# The wallpaper photo is not ours to publish; put your own at assets/darshan.jpg
+assets/*.jpg
+assets/*.png
+.DS_Store
