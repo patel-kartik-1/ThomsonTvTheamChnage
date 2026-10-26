@@ -4,15 +4,15 @@ A devotional, ad-free home screen for an Android TV, made for a Thomson Path 7X 
 
 ## What's on the screen
 
-- **Jay Swaminarayan 🙏** at the top, and a **ring clock**: a saffron ring fills with the seconds around the date, beside the time.
-- **Wi-Fi, Bluetooth and Settings** buttons at the top right.
+- **Jay Swaminarayan** at the top, and a **ring clock**: a saffron ring fills with the seconds around the date, beside the time.
+- **Wi-Fi, Bluetooth, TV settings and Settings** buttons at the top right.
 - Three cards:
   - **Sandhya Aarti**: counts down to the evening aarti ("in 25 min").
   - **Swaminarayan Mahamantra**: સ્વામિનારાયણ on saffron and maroon, with a slow golden shine.
   - **Wi-Fi**: the connected network's name. OK opens Wi-Fi settings.
 - **Apps row**: YouTube, JioHotstar, VLC, File Commander, Play Store and All Apps.
 - **Recommended Videos**: videos stored on the TV, played in VLC.
-- **Menu**: Home · Aarti · BAPS Kirtan · BAPS Channel · Inputs · Apps. The two BAPS buttons open the [BAPS Kirtan Channel](https://www.youtube.com/@BAPSKirtanChannel) and [BAPS](https://www.youtube.com/@BAPS) on YouTube.
+- **Menu**: Home · Aarti (plays the Sandhya Aarti) · BAPS Kirtan · BAPS Channel · Inputs · Apps. The two BAPS buttons open the [BAPS Kirtan Channel](https://www.youtube.com/@BAPSKirtanChannel) and [BAPS](https://www.youtube.com/@BAPS) on YouTube.
 - **Aarti reminder**: at Sandhya Aarti time a small popup asks "Play now?".
 - The cards and apps stay on the left, so the wallpaper photo's subject on the right is never covered.
 

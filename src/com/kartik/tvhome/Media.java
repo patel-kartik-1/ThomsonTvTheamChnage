@@ -24,8 +24,8 @@ final class Media {
     static final String VLC = "org.videolan.vlc", YOUTUBE = "com.google.android.youtube.tv";
 
     // YouTube channels the Aarti, Kirtan and Katha pages link to: name, address.
-    static final String[] KIRTAN_CHANNEL = {"BAPS Kirtan Channel", "https://www.youtube.com/@BAPSKirtanChannel"};
-    static final String[] BAPS_CHANNEL = {"BAPS", "https://www.youtube.com/@BAPS"};
+    static final String[] KIRTAN_CHANNEL = {"BAPS Kirtan Channel", "https://www.youtube.com/channel/UCs7ARxpbAP25LhDAnnzDuvA"};
+    static final String[] BAPS_CHANNEL = {"BAPS", "https://www.youtube.com/channel/UCuQNLnncEruW0pllaE0ZeKQ"};
 
     private Media() {}
 

@@ -56,8 +56,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// The home screen: Jay Swaminarayan, the ring clock, Wi-Fi / Bluetooth / Settings buttons, three cards (Sandhya Aarti,
-// Mahamantra, Wi-Fi), the apps row, Recommended Videos and a menu (Home, Aarti, BAPS Kirtan and BAPS
+// The home screen: Jay Swaminarayan, the ring clock, Wi-Fi / Bluetooth / TV settings / Settings buttons, three cards (Sandhya Aarti,
+// TV Health, Wi-Fi), the apps row, Recommended Videos and a menu (Home, Aarti, BAPS Kirtan and BAPS
 // Channel on YouTube, Inputs, Apps). Laid out on a 960 x 540 grid. Everything above the menu stays left of
 // x = 570, so the face and hands in the wallpaper photo are never covered.
 public class MainActivity extends Activity {
@@ -85,7 +85,6 @@ public class MainActivity extends Activity {
     private ImageView wifiCardIcon, wifiTopIcon;
     private String videoSig = "";
     private String shownWallpaper = "";
-    private android.animation.ValueAnimator shineAnim;
 
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -99,7 +98,7 @@ public class MainActivity extends Activity {
         }
     };
     private final BroadcastReceiver minuteTick = new BroadcastReceiver() {
-        @Override public void onReceive(Context c, Intent i) { refreshAarti(); }
+        @Override public void onReceive(Context c, Intent i) { refreshAarti(); refreshHealth(); }
     };
     private final ConnectivityManager.NetworkCallback networkChanged = new ConnectivityManager.NetworkCallback() {
         @Override public void onAvailable(Network n) { main.post(MainActivity.this::refreshNetwork); }
@@ -144,6 +143,7 @@ public class MainActivity extends Activity {
         tabGrid = new LinearLayout(this);
         tabGrid.setOrientation(LinearLayout.VERTICAL);
         tabGrid.setClipChildren(false);
+        tabGrid.setClipToPadding(false); // a focused tile grows into the padding
         int pad = Ui.px(this, 9); // room for a focused tile's lift and edge
         tabGrid.setPadding(pad, pad, pad, pad);
         tabScroll.addView(tabGrid);
@@ -192,13 +192,12 @@ public class MainActivity extends Activity {
         refreshNetwork();
         refreshVideos(false);
         if (!wallpaperKey().equals(shownWallpaper)) applyWallpaper(); // "Change daily" moves on overnight
-        if (shineAnim != null) shineAnim.start();
+        refreshHealth();
         if (getCurrentFocus() == null) focusFirst();
     }
 
     @Override
     protected void onPause() {
-        if (shineAnim != null) shineAnim.cancel();
         unregisterReceiver(minuteTick);
         super.onPause();
     }
@@ -245,17 +244,21 @@ public class MainActivity extends Activity {
 
     private void addTopBar(FrameLayout root) {
         TextView jay = Ui.line(this, 16, Ui.ACCENT, Ui.MEDIUM);
-        jay.setText("Jay Swaminarayan 🙏");
+        jay.setText("Jay Swaminarayan");
         jay.setLetterSpacing(0.06f);
         root.addView(jay, Ui.at(this, X, 20, -2, -2));
         root.addView(new ClockView(this), Ui.at(this, X - 6, 42, 360, 100));
 
         // Wi-Fi, Bluetooth and Settings, round, at the top right.
         wifiTopIcon = new ImageView(this);
-        root.addView(circleButton(wifiTopIcon, v -> openWifi()), Ui.at(this, 772, 24, 44, 44));
+        root.addView(circleButton(wifiTopIcon, v -> openWifi()), Ui.at(this, 720, 24, 44, 44));
         ImageView bt = new ImageView(this);
         bt.setImageDrawable(new LineIcon(LineIcon.BLUETOOTH));
-        root.addView(circleButton(bt, v -> openBluetooth()), Ui.at(this, 824, 24, 44, 44));
+        root.addView(circleButton(bt, v -> openBluetooth()), Ui.at(this, 772, 24, 44, 44));
+        // The TV's own settings, then this home screen's settings (aarti time, wallpaper).
+        ImageView tv = new ImageView(this);
+        tv.setImageDrawable(new LineIcon(LineIcon.TV));
+        root.addView(circleButton(tv, v -> openTvSettings()), Ui.at(this, 824, 24, 44, 44));
         ImageView gear = new ImageView(this);
         gear.setImageDrawable(new LineIcon(LineIcon.SETTINGS));
         root.addView(circleButton(gear, v -> showTab(SETTINGS, true)), Ui.at(this, 876, 24, 44, 44));
@@ -287,7 +290,7 @@ public class MainActivity extends Activity {
         });
         into.addView(aarti, Ui.at(this, X, 150, 160, 74));
 
-        into.addView(mantraCard(), Ui.at(this, X + 169, 150, 160, 74));
+        into.addView(healthCard(), Ui.at(this, X + 169, 150, 160, 74));
 
         wifiCardIcon = new ImageView(this);
         LinearLayout wifi = card(wifiCardIcon);
@@ -303,51 +306,77 @@ public class MainActivity extends Activity {
         into.addView(wifi, Ui.at(this, X + 338, 150, 160, 74));
     }
 
-    // The Swaminarayan Mahamantra in Gujarati on saffron and maroon, with a golden shine that sweeps
-    // across it every few seconds.
-    private View mantraCard() {
-        FrameLayout c = new FrameLayout(this);
-        GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[] {0xFFE07A1C, 0xFFB8380F, 0xFF6E1414});
-        bg.setCornerRadius(Ui.px(this, 14));
-        bg.setStroke(Ui.px(this, 1), 0x99FFD27A);
-        c.setBackground(bg);
-        c.setClipToOutline(true);
-        LinearLayout col = new LinearLayout(this);
-        col.setOrientation(LinearLayout.VERTICAL);
-        col.setGravity(Gravity.CENTER);
-        TextView gu = Ui.line(this, 19, Ui.WHITE, fromFile("/system/fonts/NotoSerifGujarati-Bold.ttf", Ui.BOLD));
-        gu.setText("સ્વામિનારાયણ"); // સ્વામિનારાયણ
-        gu.setShadowLayer(Ui.px(this, 6), 0, 0, 0x80FFD27A);
-        gu.setGravity(Gravity.CENTER);
-        col.addView(gu, new LinearLayout.LayoutParams(-1, -2));
-        TextView en = Ui.line(this, 9f, 0xE6FFE2B0, Ui.MEDIUM);
-        en.setText("MAHAMANTRA");
-        en.setLetterSpacing(0.3f);
-        en.setPadding(0, Ui.px(this, 6), 0, 0);
-        en.setGravity(Gravity.CENTER);
-        col.addView(en, new LinearLayout.LayoutParams(-1, -2));
-        c.addView(col, new FrameLayout.LayoutParams(-1, -1));
-        View shine = new View(this);
-        shine.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
-                new int[] {0x00FFFFFF, 0x4DFFF1D0, 0x00FFFFFF}));
-        shine.setRotation(18);
-        c.addView(shine, new FrameLayout.LayoutParams(Ui.px(this, 34), Ui.px(this, 120), Gravity.CENTER_VERTICAL));
-        final float from = -Ui.px(this, 60), to = Ui.px(this, 200);
-        shine.setTranslationX(from);
-        shineAnim = android.animation.ValueAnimator.ofFloat(0, 1);
-        shineAnim.setDuration(5500);
-        shineAnim.setRepeatCount(android.animation.ValueAnimator.INFINITE);
-        shineAnim.addUpdateListener(a -> {
-            float f = (float) a.getAnimatedValue();
-            shine.setTranslationX(f < 0.3f ? from + (to - from) * (f / 0.3f) : from); // sweep, then rest
-        });
+    // TV health: free memory, free storage and whether the Bluetooth remote is connected. OK clears
+    // apps waiting in the background (only apps people installed, never casting or AirPlay), to free memory.
+    private static final List<String> NEVER_CLEAN = java.util.Arrays.asList("com.ionitech.airscreen",
+            "com.google.android.apps.mediashell", "com.google.android.tv.remote.service");
+    private TextView healthMem, healthMore;
+    private ImageView healthIcon;
+    private boolean cleaning;
+
+    private View healthCard() {
+        healthIcon = new ImageView(this);
+        LinearLayout c = card(healthIcon);
+        TextView title = Ui.line(this, 14, Ui.WHITE, Ui.MEDIUM);
+        title.setText("TV Health");
+        healthMem = Ui.line(this, 12.5f, Ui.GREEN, Ui.MEDIUM);
+        healthMore = Ui.line(this, 10, Ui.DIM, Ui.REGULAR);
+        column(c).addView(title);
+        column(c).addView(spaced(healthMem, 5));
+        column(c).addView(spaced(healthMore, 4));
+        Ui.focusable(c, Ui.card(this, 14), Ui.cardFocus(this, 14), 1.04f, v -> cleanUp());
         return c;
     }
 
-    private static android.graphics.Typeface fromFile(String path, android.graphics.Typeface fallback) {
-        try { return new File(path).exists() ? android.graphics.Typeface.createFromFile(path) : fallback; }
-        catch (Exception e) { return fallback; }
+    private long freeMemoryMb() {
+        android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        android.app.ActivityManager.MemoryInfo mi = new android.app.ActivityManager.MemoryInfo();
+        am.getMemoryInfo(mi);
+        return mi.availMem / (1024 * 1024);
+    }
+
+    // The remote shows up as an input device only while its Bluetooth link is up.
+    private boolean remoteConnected() {
+        android.hardware.input.InputManager im = (android.hardware.input.InputManager) getSystemService(Context.INPUT_SERVICE);
+        for (int id : im.getInputDeviceIds()) {
+            android.view.InputDevice d = im.getInputDevice(id);
+            if (d != null && !d.isVirtual() && d.getName() != null
+                    && d.getName().toLowerCase(Locale.ROOT).contains("remote")) return true;
+        }
+        return false;
+    }
+
+    private void refreshHealth() {
+        if (healthMem == null || cleaning) return;
+        long mb = freeMemoryMb();
+        int color = mb >= 250 ? Ui.GREEN : mb >= 150 ? Ui.ACCENT : Ui.RED;
+        healthMem.setText(mb + " MB free");
+        healthMem.setTextColor(color);
+        healthIcon.setImageDrawable(new LineIcon(LineIcon.PULSE, color));
+        android.os.StatFs st = new android.os.StatFs(android.os.Environment.getExternalStorageDirectory().getPath());
+        healthMore.setText(String.format(Locale.ROOT, "%.1f GB \u00B7 Remote %s",
+                st.getAvailableBytes() / 1073741824f, remoteConnected() ? "\u2713" : "off"));
+    }
+
+    private void cleanUp() {
+        if (cleaning) return;
+        cleaning = true;
+        final long before = freeMemoryMb();
+        healthMem.setText("Cleaning\u2026");
+        healthMem.setTextColor(Ui.ACCENT);
+        android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (android.content.pm.ApplicationInfo ai : getPackageManager().getInstalledApplications(0)) {
+            boolean installed = (ai.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) == 0
+                    || "com.google.android.youtube.tv".equals(ai.packageName);
+            if (installed && !NEVER_CLEAN.contains(ai.packageName) && !ai.packageName.equals(getPackageName()))
+                am.killBackgroundProcesses(ai.packageName);
+        }
+        main.postDelayed(() -> {
+            long freed = freeMemoryMb() - before;
+            healthMem.setText(freed > 5 ? "Freed " + freed + " MB \u2713" : "Already clean \u2713");
+            healthMem.setTextColor(Ui.GREEN);
+            main.postDelayed(() -> { cleaning = false; refreshHealth(); }, 4000);
+        }, 1500);
     }
 
     private LinearLayout card(View icon) {
@@ -392,6 +421,7 @@ public class MainActivity extends Activity {
             b.setOnClickListener(v -> {
                 if (KIRTAN.equals(name)) Media.openYouTube(this, Media.KIRTAN_CHANNEL[1]);
                 else if (BAPS.equals(name)) Media.openYouTube(this, Media.BAPS_CHANNEL[1]);
+                else if ("Aarti".equals(name) && Media.play(this, Media.sandhya())) { /* plays the aarti video */ }
                 else showTab(name, true);
             });
             b.setOnFocusChangeListener((v, has) -> {
