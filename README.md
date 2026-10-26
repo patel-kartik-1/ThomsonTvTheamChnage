@@ -8,7 +8,7 @@ A devotional, ad-free home screen for an Android TV, made for a Thomson Path 7X 
 - **Wi-Fi, Bluetooth, TV settings and Settings** buttons at the top right.
 - Three cards:
   - **Sandhya Aarti**: counts down to the evening aarti ("in 25 min").
-  - **Swaminarayan Mahamantra**: સ્વામિનારાયણ on saffron and maroon, with a slow golden shine.
+  - **TV Health**: free memory, free storage and whether the remote is connected. OK clears apps waiting in the background.
   - **Wi-Fi**: the connected network's name. OK opens Wi-Fi settings.
 - **Apps row**: YouTube, JioHotstar, VLC, File Commander, Play Store and All Apps.
 - **Recommended Videos**: videos stored on the TV, played in VLC.
@@ -19,7 +19,7 @@ A devotional, ad-free home screen for an Android TV, made for a Thomson Path 7X 
 ## On the TV
 
 | Folder | What goes there |
-|---|---|
+| --- | --- |
 | `BAPS/Aarti`, `BAPS/Kirtan`, `BAPS/Katha` | Videos. The file name is the title; a `.jpg` with the same name is the thumbnail. |
 | `BAPS/Wallpapers` | Wallpaper photos. Pick one in Settings → Wallpaper, or choose "Change daily". |
 
