@@ -316,15 +316,17 @@ public class MainActivity extends Activity {
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setGravity(Gravity.CENTER);
-        TextView gu = Ui.line(this, 23, Ui.WHITE, fromFile("/system/fonts/NotoSerifGujarati-Bold.ttf", Ui.BOLD));
+        TextView gu = Ui.line(this, 19, Ui.WHITE, fromFile("/system/fonts/NotoSerifGujarati-Bold.ttf", Ui.BOLD));
         gu.setText("સ્વામિનારાયણ"); // સ્વામિનારાયણ
         gu.setShadowLayer(Ui.px(this, 6), 0, 0, 0x80FFD27A);
-        col.addView(gu);
-        TextView en = Ui.line(this, 9.5f, 0xE6FFE2B0, Ui.MEDIUM);
-        en.setText("SWAMINARAYAN MAHAMANTRA");
-        en.setLetterSpacing(0.12f);
+        gu.setGravity(Gravity.CENTER);
+        col.addView(gu, new LinearLayout.LayoutParams(-1, -2));
+        TextView en = Ui.line(this, 9f, 0xE6FFE2B0, Ui.MEDIUM);
+        en.setText("MAHAMANTRA");
+        en.setLetterSpacing(0.3f);
         en.setPadding(0, Ui.px(this, 6), 0, 0);
-        col.addView(en);
+        en.setGravity(Gravity.CENTER);
+        col.addView(en, new LinearLayout.LayoutParams(-1, -2));
         c.addView(col, new FrameLayout.LayoutParams(-1, -1));
         View shine = new View(this);
         shine.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
@@ -889,7 +891,7 @@ public class MainActivity extends Activity {
         if (aartiStatus == null) return;
         String s = Aarti.status(this);
         aartiStatus.setText(s);
-        aartiWhen.setText(("Tomorrow".equals(s) ? "Tomorrow" : "Today") + " · " + Aarti.clock(Aarti.minutes(this)));
+        aartiWhen.setText(("Tomorrow".equals(s) ? "at " : "Today · ") + Aarti.clock(Aarti.minutes(this)));
     }
 
     // The Wi-Fi card and button follow the connection: network name, Connected, signal bars.
